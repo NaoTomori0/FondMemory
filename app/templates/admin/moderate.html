@@ -12,8 +12,10 @@
                 <p class="text-muted small">— {{ post.author.username }} ({{ post.created_at.strftime('%d.%m.%Y %H:%M') }})</p>
             </div>
             {% elif post.file_filename %}
-                    {% if post.file_type == 'photo' %}
-            <img src="{{ url_for('static', filename='uploads/' + post.file_filename) }}" class="card-img-top" alt="...">
+            {% if post.file_type == 'photo' %}
+            <a href="{{ url_for('static', filename='uploads/' + post.file_filename) }}" data-fancybox="gallery">
+                <img src="{{ url_for('static', filename='uploads/' + post.file_filename) }}" class="card-img-top">
+            </a>
             {% elif post.file_type == 'video' %}
             <video controls class="card-img-top">
                 <source src="{{ url_for('static', filename='uploads/' + post.file_filename) }}" type="video/mp4">
