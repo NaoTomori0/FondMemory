@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="container" style="max-width: 600px;">
+    <h1>Редактирование</h1>
+    <form method="POST">
+        {% if post.file_type == 'text' %}
+        <div class="mb-3">
+            <label for="content" class="form-label">Текст сообщения</label>
+            <textarea
+                class="form-control"
+                id="content"
+                name="content"
+                rows="5"
+                required
+            >{{ post.content or '' }}</textarea>
+        </div>
+        {% else %}
+        <div class="mb-3">
+            <label for="description" class="form-label">Описание</label>
+            <textarea
+                class="form-control"
+                id="description"
+                name="description"
+                rows="3"
+            >{{ post.description or '' }}</textarea>
+        </div>
+        {% if post.file_filename %}
+        <p>Файл: {{ post.file_filename }} (замена файла временно недоступна)</p>
+        {% endif %}
+        {% endif %}
+        <div class="alert alert-warning">После сохранения пост будет отправлен на модерацию.</div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a href="{{ url_for('cabinet.index') }}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

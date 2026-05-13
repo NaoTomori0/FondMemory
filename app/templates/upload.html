@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Загрузить воспоминание</h1>
+<form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="content" class="form-label">Текст сообщения (если хотите оставить просто слова)</label>
+        <textarea
+            class="form-control"
+            id="content"
+            name="content"
+            rows="3"
+        ></textarea>
+    </div>
+    <div class="mb-3">
+        <label for="file" class="form-label">Или прикрепите фото/видео</label>
+        <input
+            class="form-control"
+            type="file"
+            id="file"
+            name="file"
+            accept="image/*,video/*"
+        >
+    </div>
+    <button type="submit" class="btn btn-primary">Загрузить</button>
+</form>
+<div class="py-4 mt-4 border-top"></div>
+{% endblock %}

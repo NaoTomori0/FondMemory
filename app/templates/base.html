@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru" data-bs-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Fond Memory</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <style>
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 60px;
+            background: #1e1e1e;
+            z-index: 1040;
+            transition: width 0.3s ease;
+            overflow-x: hidden;
+            white-space: nowrap;
+            padding-top: 70px;
+        }
+        .sidebar:hover {
+            width: 220px;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ccc;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .sidebar a:hover {
+            background: #333;
+            color: #fff;
+        }
+        .sidebar a i {
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+            margin-right: 10px;
+        }
+        .sidebar a .link-text {
+            display: none;
+        }
+        .sidebar:hover a .link-text {
+            display: inline;
+        }
+        body {
+            margin-left: 60px;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <a href="{{ url_for('main.index') }}" title="Главная">
+                <i class="fa-solid fa-house"></i>
+                <span class="link-text">Главная</span>
+            </a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('board.index') }}" title="Доска">
+                <i class="fa-solid fa-images"></i>
+                <span class="link-text">Доска</span>
+            </a>
+            <a href="{{ url_for('board.upload') }}" title="Загрузить">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span class="link-text">Загрузить</span>
+            </a>
+            <a href="{{ url_for('cabinet.index') }}" title="Профиль">
+                <i class="fa-solid fa-user"></i>
+                <span class="link-text">Профиль</span>
+            </a>
+            {% if current_user.is_admin() %}
+            <a href="{{ url_for('admin.moderate') }}" title="Модерация">
+                <i class="fa-solid fa-gavel"></i>
+                <span class="link-text">Модерация</span>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('auth.logout') }}" title="Выйти">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="link-text">Выйти</span>
+            </a>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}" title="Войти">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span class="link-text">Войти</span>
+            </a>
+            <a href="{{ url_for('auth.register') }}" title="Регистрация">
+                <i class="fa-solid fa-user-plus"></i>
+                <span class="link-text">Регистрация</span>
+            </a>
+            {% endif %}
+        </div>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand ms-2" href="{{ url_for('main.index') }}">Fond Memory</a>
+            </div>
+        </nav>
+        <main class="container-fluid">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+        {% block body %}{% endblock %}
+        </main>
+        <footer class="text-center text-muted ">
+            <small>&copy; {{ year }} OnyxSky Studio</small>
+        </footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/5.0.0/imagesloaded.pkgd.min.js"></script>
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,218 @@
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session
+from flask_login import login_user, logout_user, current_user, login_required
+from app import db, oauth
+from .utils import send_verification_email
+from app.models import User
+from datetime import datetime
+import random
+import string
+import secrets
+
+bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+
+def generate_verification_code():
+    return "".join(random.choices(string.digits, k=6))
+
+
+@bp.route("/register", methods=["GET", "POST"])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
+
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+
+        errors = {"username_error": "", "email_error": "", "password_error": ""}
+        if not username or len(username) < 3 or len(username) > 30:
+            errors["username_error"] = "Имя должно быть от 3 до 30 символов."
+        if not email or "@" not in email:
+            errors["email_error"] = "Введите корректный email."
+        if User.query.filter_by(email=email).first():
+            errors["email_error"] = "Email уже используется."
+        if User.query.filter_by(username=username).first():
+            errors["username_error"] = "Имя пользователя занято."
+        if not password or len(password) < 8 or len(password) > 20:
+            errors["password_error"] = "Пароль должен быть от 8 до 20 символов."
+
+        if any(errors.values()):
+            return render_template(
+                "register.html",
+                username_value=username,
+                email_value=email,
+                **errors,
+                year=datetime.now().year,
+            )
+
+        user = User(username=username, email=email, role="user", email_verified=False)
+        user.set_password(password)
+        code = generate_verification_code()
+        user.verification_code = code
+        db.session.add(user)
+        db.session.commit()
+
+        send_verification_email(user)
+
+        session["pending_verification_email"] = email
+        flash(
+            "На ваш email отправлен код подтверждения. Введите его ниже. Проверьте папку 'Спам'",
+            "info",
+        )
+        return redirect(url_for("auth.verify_email"))
+
+    return render_template("register.html", year=datetime.now().year)
+
+
+@bp.route("/verify-email", methods=["GET", "POST"])
+def verify_email():
+    email = session.get("pending_verification_email")
+    if not email:
+        return redirect(url_for("auth.register"))
+
+    if request.method == "POST":
+        code = request.form.get("code", "").strip()
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash("Пользователь не найден", "danger")
+            return redirect(url_for("auth.register"))
+
+        if user.verification_code == code:
+            user.email_verified = True
+            user.verification_code = None
+            db.session.commit()
+            session.pop("pending_verification_email", None)
+            login_user(user)
+            flash("Email подтверждён! Добро пожаловать.", "success")
+            return redirect(url_for("main.index"))
+        else:
+            flash("Неверный код. Попробуйте ещё раз.", "danger")
+
+    return render_template("verify_email.html", year=datetime.now().year)
+
+
+@bp.route("/verify-email/resend")
+def resend_code():
+    email = session.get("pending_verification_email")
+    if not email:
+        flash("Сессия истекла. Пожалуйста, начните регистрацию заново.", "warning")
+        return redirect(url_for("auth.register"))
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return redirect(url_for("auth.register"))
+
+    if user.email_verified:
+        flash("Ваш email уже подтверждён. Войдите в систему.", "info")
+        return redirect(url_for("auth.login"))
+
+    code = generate_verification_code()
+    user.verification_code = code
+    db.session.commit()
+    send_verification_email(user)
+
+    flash("Новый код отправлен. Проверьте папку 'Спам'", "info")
+    return redirect(url_for("auth.verify_email"))
+
+
+@bp.route("/login", methods=["GET", "POST"])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
+
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+
+        user = User.query.filter_by(email=email).first()
+        if not user or not user.check_password(password):
+            return render_template(
+                "login.html",
+                email_value=email,
+                email_error="Неверный email или пароль.",
+                password_error="Неверный email или пароль.",
+                year=datetime.now().year,
+            )
+
+        if not user.email_verified:
+            code = generate_verification_code()
+            user.verification_code = code
+            db.session.commit()
+            session["pending_verification_email"] = user.email
+            flash("Ваш email не подтверждён. Новый код отправлен.", "warning")
+            return redirect(url_for("auth.verify_email"))
+
+        login_user(user)
+        flash("Вы вошли в систему", "success")
+        next_page = request.args.get("next")
+        return redirect(next_page or url_for("main.index"))
+
+    return render_template("login.html", year=datetime.now().year)
+
+
+@bp.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("main.index"))
+
+
+# ---------- Google OAuth ----------
+@bp.route("/login/google")
+def google_login():
+    redirect_uri = url_for("auth.google_auth", _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+
+@bp.route("/auth/google/callback")
+def google_auth():
+    token = oauth.google.authorize_access_token()
+    user_info = token.get("userinfo")
+    if not user_info:
+        flash("Ошибка данных Google", "danger")
+        return redirect(url_for("auth.login"))
+
+    email = user_info["email"]
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        username = email.split("@")[0]
+        if User.query.filter_by(username=username).first():
+            username = f"{username}_{secrets.token_hex(2)}"
+        user = User.create_with_random_password(email, username)
+        db.session.add(user)
+        db.session.commit()
+
+    login_user(user)
+    return redirect(url_for("main.index"))
+
+
+# ---------- GitHub OAuth ----------
+@bp.route("/login/github")
+def github_login():
+    redirect_uri = url_for("auth.github_auth", _external=True)
+    return oauth.github.authorize_redirect(redirect_uri)
+
+
+@bp.route("/auth/github/callback")
+def github_auth():
+    token = oauth.github.authorize_access_token()
+    resp = oauth.github.get("user")
+    user_info = resp.json()
+    email = user_info.get("email")
+
+    if not email:
+        emails = oauth.github.get("user/emails").json()
+        email = next(e["email"] for e in emails if e["primary"])
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        username = user_info.get("login") or email.split("@")[0]
+        if User.query.filter_by(username=username).first():
+            username = f"{username}_{secrets.token_hex(2)}"
+        user = User.create_with_random_password(email, username)
+        db.session.add(user)
+        db.session.commit()
+
+    login_user(user)
+    return redirect(url_for("main.index"))

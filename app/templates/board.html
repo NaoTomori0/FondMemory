@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Доска памяти</h1>
+<div class="masonry-grid">
+    {% for item in posts_data %}
+    {% set post = item.post %}
+    <div class="masonry-item">
+        <div class="card position-relative">
+            {% if post.file_type == 'photo' and post.file_filename %}
+            <img src="{{ url_for('static', filename='uploads/' + post.file_filename) }}" alt="...">
+            {% elif post.file_type == 'video' and post.file_filename %}
+            <video controls>
+                <source src="{{ url_for('static', filename='uploads/' + post.file_filename) }}" type="video/mp4">
+            </video>
+            {% elif post.file_type == 'text' %}
+            <div class="card-body">
+                <p class="card-text fs-5">{{ post.content }}</p>
+                <p class="text-muted small">— {{ post.author.username }}</p>
+            </div>
+            {% endif %}
+            {% if post.description and post.file_type != 'text' %}
+            <div class="card-body">
+                <p class="card-text">{{ post.description }}</p>
+                <p class="text-muted small">{{ post.author.username }} — {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+            </div>
+            {% endif %}
+            <!-- Блок с сердечком и лайками (AJAX) -->
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <div class="like-section" data-post-id="{{ post.id }}">
+                    {% if current_user.is_authenticated %}
+                    <button class="btn btn-link p-0 border-0 like-btn {% if item.liked %}text-danger{% else %}text-muted{% endif %}" title="Нравится">
+                        <i class="{% if item.liked %}fa-solid fa-heart{% else %}fa-regular fa-heart{% endif %}"></i>
+                    </button>
+                    {% else %}
+                    <span class="text-muted">
+                        <i class="fa-regular fa-heart"></i>
+                    </span>
+                    {% endif %}
+                    <span class="likes-count ms-1">{{ item.likes_count }}</span>
+                </div>
+                {% if current_user.is_admin() %}
+                <!-- корзина удаления -->
+                <form method="POST" action="{{ url_for('admin.delete_post', id=post.id) }}" onsubmit="return confirm('Удалить этот пост?');">
+                    <button type="submit" class="btn btn-sm btn-danger rounded-circle" title="Удалить пост">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div class="py-4 mt-4 border-top"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Инициализация Masonry
+    (function() {
+        var grid = document.querySelector('.masonry-grid');
+        if (!grid) return;
+        function initMasonry() {
+            if (typeof Masonry === 'undefined') {
+                grid.style.display = 'flex';
+                grid.style.flexWrap = 'wrap';
+                return;
+            }
+            imagesLoaded(grid, function() {
+                new Masonry(grid, {
+                    itemSelector: '.masonry-item',
+                    columnWidth: '.masonry-item',
+                    percentPosition: true,
+                    gutter: 20
+                });
+            });
+        }
+        initMasonry();
+    })();
+
+    // Обработчик лайков (AJAX)
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.like-btn');
+        if (!btn) return;
+        e.preventDefault();
+
+        const section = btn.closest('.like-section');
+        const postId = section.dataset.postId;
+        const isLiked = btn.classList.contains('text-danger');
+        const url = isLiked ? '/board/api/unlike/' + postId : '/board/api/like/' + postId;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            // обновить счётчик
+            section.querySelector('.likes-count').textContent = data.likes_count;
+            // переключить классы и иконку
+            const icon = btn.querySelector('i');
+            if (isLiked) {
+                btn.classList.remove('text-danger');
+                btn.classList.add('text-muted');
+                icon.classList.remove('fa-solid', 'fa-heart');
+                icon.classList.add('fa-regular', 'fa-heart');
+            } else {
+                btn.classList.remove('text-muted');
+                btn.classList.add('text-danger');
+                icon.classList.remove('fa-regular', 'fa-heart');
+                icon.classList.add('fa-solid', 'fa-heart');
+            }
+        })
+        .catch(err => console.error(err));
+    });
+</script>
+{% endblock %}
