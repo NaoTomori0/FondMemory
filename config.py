@@ -6,6 +6,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
+    VERSION = "1.1"  # меняйть при каждом обновлении CSS
+
     SECRET_KEY = os.environ.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir, "app.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
