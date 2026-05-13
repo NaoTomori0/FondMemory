@@ -7,7 +7,7 @@
     <div class="masonry-item">
         <div class="card position-relative">
             {% if post.file_type == 'photo' and post.file_filename %}
-            <a href="{{ url_for('static', filename='uploads/' + post.file_filename) }}" data-fancybox="gallery">
+            <a href="#" class="lightbox-trigger" data-full="{{ url_for('static', filename='uploads/' + post.file_filename) }}">
                 <img src="{{ url_for('static', filename='uploads/' + post.file_filename) }}">
             </a>
             {% elif post.file_type == 'video' and post.file_filename %}

@@ -13,7 +13,7 @@
             </div>
             {% elif post.file_filename %}
             {% if post.file_type == 'photo' %}
-            <a href="{{ url_for('static', filename='uploads/' + post.file_filename) }}" data-fancybox="gallery">
+            <a href="#" class="lightbox-trigger" data-full="{{ url_for('static', filename='uploads/' + post.file_filename) }}">
                 <img src="{{ url_for('static', filename='uploads/' + post.file_filename) }}" class="card-img-top">
             </a>
             {% elif post.file_type == 'video' %}
