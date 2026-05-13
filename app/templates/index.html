@@ -3,7 +3,10 @@
 <div class="text-center mt-5">
     <h1 class="display-1 fw-bold">Fond Memory</h1>
     {% if memorial_name %}
-    <p class="lead mt-2 mb-4">{{ memorial_name }}{% if memorial_years %} ({{ memorial_years }}){% endif %}</p>
+    <p class="memorial-text mt-2 mb-1">{{ memorial_name }}</p>
+    {% if memorial_years %}
+    <p class="memorial-years mb-4">{{ memorial_years }}</p>
+    {% endif %}
     {% endif %}
     <p class="lead mt-3">Сохраните самые тёплые воспоминания</p>
     {% if current_user.is_authenticated %}
