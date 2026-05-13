@@ -76,4 +76,23 @@ def create_app(config_class=Config):
             db.session.commit()
             print(f"✅ Администратор {username} создан")
 
+    @app.cli.command("gen-admin-login")
+    def gen_admin_login():
+        import os
+        from .routes.utils import generate_admin_permanent_token
+
+        with app.app_context():
+            from app.models import User
+
+            admin = User.query.filter_by(role="admin").first()
+            if not admin:
+                print(
+                    "❌ Администратор не найден. Создайте его через flask create-admin"
+                )
+                return
+            token = generate_admin_permanent_token(admin.id)
+            base_url = os.environ.get("BASE_URL", "http://127.0.0.1:5000")
+            print(f"✅ Постоянная ссылка для входа администратора (не истекает):")
+            print(f"{base_url}/auth/admin-login/{token}")
+
     return app

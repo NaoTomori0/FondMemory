@@ -31,18 +31,22 @@
 ## Установка и запуск (для разработки)
 
 ### 1. Клонируйте репозиторий
+
 ```bash
 git clone https://github.com/NaoTomori/FondMemory.git
 cd FondMemory
 ```
 
 ### 2. Установите зависимости
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+
 ### 3. Настройте переменные окружения
+
 Создайте файл .env в корне проекта:
 
 ```text
@@ -58,22 +62,30 @@ MAIL_PASSWORD=пароль_приложения_яндекса
 MAIL_DEFAULT_SENDER=your_email@yandex.ru
 MEMORY_NAME=Иван Иванович Иванов
 MEMORY_YEARS=1956–2024
+BASE_URL=...
 ```
+
 ### 4. Инициализируйте базу данных
+
 ```bash
 flask db init
 flask db migrate -m "Initial"
 flask db upgrade
 flask create-admin
 ```
+
 ### 5. Запустите сервер
+
 ```bash
 python run.py
 ```
+
 Сайт будет доступен по адресу http://127.0.0.1:5000.
 
 ## Развёртывание на продакшен-сервере (Ubuntu + Nginx + Gunicorn)
+
 ### 1. Установите системные зависимости
+
 ```bash
 sudo apt update
 sudo apt install python3-pip python3-venv nginx git -y
@@ -82,15 +94,20 @@ bash
 git clone https://github.com/NaoTomori/FondMemory.git /home/nao/FondMemory
 cd /home/nao/FondMemory
 ```
+
 ### 2. Настройте виртуальное окружение и установите зависимости
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
+
 ### 3. Создайте файл .env (как в шаге 3 разработки)
+
 ### 4. Инициализируйте базу данных
+
 ```bash
 flask db init
 flask db migrate -m "Initial"
@@ -99,12 +116,15 @@ flask create-admin
 ```
 
 ### 5. Настройте Gunicorn
+
 Создайте файл wsgi.py:
+
 ```
 python
 from app import create_app
 app = create_app()
 ```
+
 ### 6. Создайте systemd-юнит /etc/systemd/system/fondmemory.service:
 
 ```ini
@@ -125,7 +145,9 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 ```
+
 ### 7. Запустите сервис:
+
 ```
 bash
 sudo systemctl daemon-reload
@@ -134,6 +156,7 @@ sudo systemctl enable fondmemory
 ```
 
 ### 8. Настройте Nginx
+
 Создайте конфигурацию /etc/nginx/sites-available/fondmemory:
 
 ```
@@ -164,7 +187,9 @@ server {
     }
 }
 ```
+
 ### 9. Активируйте сайт:
+
 ```
 bash
 sudo ln -s /etc/nginx/sites-available/fondmemory /etc/nginx/sites-enabled/

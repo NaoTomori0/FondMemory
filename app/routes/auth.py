@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, current_user, login_required
 from app import db, oauth
-from .utils import send_verification_email
+from .utils import send_verification_email, verify_admin_permanent_token
 from app.models import User
 from datetime import datetime
 import random
@@ -9,6 +9,25 @@ import string
 import secrets
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+
+@bp.route("/admin-login/<token>")
+def admin_login(token):
+    admin_id = verify_admin_permanent_token(token)
+    if not admin_id:
+        flash("Неверный токен доступа", "danger")
+        return redirect(url_for("main.index"))
+
+    from app.models import User
+
+    user = User.query.get(admin_id)
+    if not user or not user.is_admin():
+        flash("Пользователь не является администратором", "danger")
+        return redirect(url_for("main.index"))
+
+    login_user(user)
+    flash("Вы вошли как администратор (постоянная ссылка)", "success")
+    return redirect(url_for("board.index"))
 
 
 def generate_verification_code():
