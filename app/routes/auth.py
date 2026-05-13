@@ -57,7 +57,7 @@ def register():
 
         session["pending_verification_email"] = email
         flash(
-            "На ваш email отправлен код подтверждения. Введите его ниже. Проверьте папку 'Спам'",
+            "На ваш email отправлен код подтверждения. Введите его ниже.",
             "info",
         )
         return redirect(url_for("auth.verify_email"))
