@@ -50,3 +50,19 @@
   pointer-events: none; /* чтобы не мешали кликам */
   user-select: none;
 }
+
+.video-wrapper {
+  position: relative;
+  padding-top: 56.25%; /* 16:9, для вертикальных видео можно подправить */
+  background: #000;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.video-wrapper video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
