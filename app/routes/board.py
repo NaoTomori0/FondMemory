@@ -15,10 +15,11 @@ import os, uuid
 from werkzeug.utils import secure_filename
 from threading import Thread
 from datetime import datetime
+import asyncio
 
 bp = Blueprint("board", __name__, url_prefix="/board")
 
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "mp4", "mov", "avi"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "mp4"}
 
 
 def allowed_file(filename):
@@ -49,15 +50,16 @@ def index():
 
 @bp.route("/upload", methods=["GET", "POST"])
 @login_required
-def upload():
+async def upload():
     if request.method == "POST":
-        content = request.form.get("content", "").strip()
-        file = request.files.get("file")
+        content_type = request.form.get("content_type", "text")
 
-        if not file or file.filename == "":
+        # --- Обработка текстового сообщения ---
+        if content_type == "text":
+            content = request.form.get("content", "").strip()
             if not content:
-                flash("Введите текст сообщения или выберите файл", "danger")
-                return render_template("upload.html", year=datetime.now().year)
+                flash("Введите текст сообщения", "danger")
+                return render_template("upload.html")
             post = Post(
                 file_filename=None,
                 file_type="text",
@@ -69,28 +71,39 @@ def upload():
             flash("Сообщение отправлено на модерацию", "success")
             return redirect(url_for("board.index"))
 
-        if not allowed_file(file.filename):
-            flash("Допустимые форматы: PNG, JPG, GIF, MP4, MOV, AVI", "danger")
-            return render_template("upload.html", year=datetime.now().year)
+        # --- Обработка файла ---
+        else:
+            description = request.form.get("description", "").strip()
+            file = request.files.get("file")
+            if not file or file.filename == "":
+                flash("Выберите файл", "danger")
+                return render_template("upload.html")
+            if not allowed_file(file.filename):
+                flash("Допустимые форматы: PNG, JPG, GIF, MP4, MOV, AVI", "danger")
+                return render_template("upload.html")
 
-        filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
-        filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
-        Thread(target=async_save, args=(file, filepath)).start()
+            filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
+            filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
+            # file.save(filepath)
+            await asyncio.to_thread(file.save, filepath)
 
-        file_type = (
-            "video" if filename.lower().endswith(("mp4", "mov", "avi")) else "photo"
-        )
-        post = Post(
-            file_filename=filename,
-            file_type=file_type,
-            description=request.form.get("description", "").strip(),
-            user_id=current_user.id,
-        )
-        db.session.add(post)
-        db.session.commit()
-        flash("Файл загружен и отправлен на модерацию", "success")
-        return redirect(url_for("board.index"))
-    return render_template("upload.html", year=datetime.now().year)
+            # Thread(target=async_save, args=(file, filepath)).start()
+
+            file_type = (
+                "video" if filename.lower().endswith(("mp4", "mov", "avi")) else "photo"
+            )
+            post = Post(
+                file_filename=filename,
+                file_type=file_type,
+                description=description,
+                user_id=current_user.id,
+            )
+            db.session.add(post)
+            db.session.commit()
+            flash("Файл загружен и отправлен на модерацию", "success")
+            return redirect(url_for("board.index"))
+
+    return render_template("upload.html")
 
 
 # API-маршруты для AJAX-лайков

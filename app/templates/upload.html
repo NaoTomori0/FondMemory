@@ -2,26 +2,94 @@
 {% block body %}
 <h1>Загрузить воспоминание</h1>
 <form method="POST" enctype="multipart/form-data">
+    <!-- Выбор типа контента -->
     <div class="mb-3">
-        <label for="content" class="form-label">Текст сообщения (если хотите оставить просто слова)</label>
-        <textarea
-            class="form-control"
-            id="content"
-            name="content"
-            rows="3"
-        ></textarea>
+        <div class="form-check form-check-inline">
+            <input
+                class="form-check-input"
+                type="radio"
+                name="content_type"
+                id="type_text"
+                value="text"
+                checked
+            >
+            <label class="form-check-label" for="type_text">Текст</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input
+                class="form-check-input"
+                type="radio"
+                name="content_type"
+                id="type_file"
+                value="file"
+            >
+            <label class="form-check-label" for="type_file">Фото / Видео</label>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="file" class="form-label">Или прикрепите фото/видео</label>
-        <input
-            class="form-control"
-            type="file"
-            id="file"
-            name="file"
-            accept="image/*,video/*"
-        >
+    <!-- Блок для текстового сообщения -->
+    <div id="text-block">
+        <div class="mb-3">
+            <label for="content" class="form-label">Текст сообщения</label>
+            <textarea
+                class="form-control"
+                id="content"
+                name="content"
+                rows="4"
+                required
+            ></textarea>
+        </div>
+    </div>
+    <!-- Блок для файла -->
+    <div id="file-block" style="display: none;">
+        <div class="mb-3">
+            <label for="file" class="form-label">Выберите файл</label>
+            <input
+                class="form-control"
+                type="file"
+                id="file"
+                name="file"
+                accept="image/*,video/mp4"
+            >
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Описание (цитата)</label>
+            <textarea
+                class="form-control"
+                id="description"
+                name="description"
+                rows="2"
+            ></textarea>
+        </div>
     </div>
     <button type="submit" class="btn btn-primary">Загрузить</button>
 </form>
-<div class="py-4 mt-4 border-top"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const typeText = document.getElementById('type_text');
+    const typeFile = document.getElementById('type_file');
+    const textBlock = document.getElementById('text-block');
+    const fileBlock = document.getElementById('file-block');
+    const contentField = document.getElementById('content');
+    const fileField = document.getElementById('file');
+
+    function toggleBlocks() {
+        if (typeFile.checked) {
+            textBlock.style.display = 'none';
+            fileBlock.style.display = 'block';
+            contentField.required = false;
+            fileField.required = true;
+        } else {
+            textBlock.style.display = 'block';
+            fileBlock.style.display = 'none';
+            contentField.required = true;
+            fileField.required = false;
+        }
+    }
+
+    typeText.addEventListener('change', toggleBlocks);
+    typeFile.addEventListener('change', toggleBlocks);
+    window.addEventListener('DOMContentLoaded', toggleBlocks);
+</script>
 {% endblock %}

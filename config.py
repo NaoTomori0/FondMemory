@@ -10,7 +10,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir, "app.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = os.path.join(basedir, "app/static/uploads")
-    MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50 MB
+    MAX_CONTENT_LENGTH = 200 * 1024 * 1024  # 200 MB
     WTF_CSRF_ENABLED = True
 
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
