@@ -35,6 +35,27 @@ const posts = [
         {% endfor %}
     ];
     
+
+const recentPosts = [];
+const MAX_RECENT = 10;
+
+function getRandomPost() {
+    if (posts.length === 0) return null;
+    let attempts = 0;
+    let post;
+    do {
+        post = posts[Math.floor(Math.random() * posts.length)];
+        attempts++;
+        if (attempts > 50) break; 
+    } while (recentPosts.includes(post));
+
+    recentPosts.push(post);
+    if (recentPosts.length > MAX_RECENT) {
+        recentPosts.shift();
+    }
+    return post;
+}
+
 function createFlyingElement(post) {
     if (post.type === 'text') {
         _createElement(post, null);
@@ -102,9 +123,10 @@ function _createElement(post, preloadedImg) {
 }
 
 function launchRandomPost() {
-    if (posts.length === 0) return;
-    const randomPost = posts[Math.floor(Math.random() * posts.length)];
-    createFlyingElement(randomPost);
+    const randomPost = getRandomPost();
+    if (randomPost) {
+        createFlyingElement(randomPost);
+    }
 }
 
 launchRandomPost();
