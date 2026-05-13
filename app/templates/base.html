@@ -114,7 +114,7 @@
                 <a class="navbar-brand ms-2" href="{{ url_for('main.index') }}">Fond Memory</a>
             </div>
         </nav> -->
-        <main class="container-fluid">
+        <main class="container-fluid py-5">
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% for category, message in messages %}
             <div class="alert alert-{{ category }} alert-dismissible fade show">{{ message }}</div>
