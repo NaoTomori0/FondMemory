@@ -6,7 +6,157 @@
         <title>Fond Memory</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> -->
+        <style>
+        /* Стили для Masonry */
+.masonry-grid {
+  /* небольшой отступ, чтобы контент не прилипал к краям */
+  margin: 0 auto;
+}
+
+/* Каждая карточка – невидимый блок, Masonry сам задаст позицию */
+.masonry-item {
+  width: calc(33.333% - 20px); /* 3 колонки на десктопе, отступы */
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.masonry-item:hover {
+  transform: scale(1.02);
+}
+
+.card {
+  border: none;
+  background: #2c2c2c;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card img,
+.card video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.card-body {
+  padding: 15px;
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+  .masonry-item {
+    width: calc(50% - 20px);
+  }
+}
+@media (max-width: 576px) {
+  .masonry-item {
+    width: calc(100% - 20px);
+  }
+}
+
+.floating-item {
+  will-change: transform, opacity;
+  pointer-events: none; /* чтобы не мешали кликам */
+  user-select: none;
+}
+
+.video-wrapper {
+  position: relative;
+  padding-top: 56.25%; /* 16:9, для вертикальных видео можно подправить */
+  background: #000;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.video-wrapper video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 60px;
+  background: #1e1e1e;
+  z-index: 1040;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  white-space: nowrap;
+  padding-top: 70px;
+}
+.sidebar:hover {
+  width: 220px;
+}
+.sidebar a {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  color: #ccc;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.sidebar a:hover {
+  background: #333;
+  color: #fff;
+}
+.sidebar a i {
+  font-size: 1.5rem;
+  width: 30px;
+  text-align: center;
+  margin-right: 10px;
+}
+.sidebar a .link-text {
+  display: none;
+}
+.sidebar:hover a .link-text {
+  display: inline;
+}
+body {
+  margin-left: 60px;
+}
+.lightbox-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+.lightbox-overlay.active {
+  display: flex;
+}
+.lightbox-overlay img {
+  max-width: 95%;
+  max-height: 95%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+}
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+  background: none;
+  border: none;
+  z-index: 10000;
+}
+.lightbox-close:hover {
+  color: #ccc;
+}
+        </style>
         <!-- Fancybox
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css">
         <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script> -->
