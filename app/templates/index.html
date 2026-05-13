@@ -111,7 +111,8 @@ function _createElement(post, preloadedImg) {
         function animate() {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            const currentOffset = progress * (window.innerWidth + el.offsetWidth + 200);
+
+            const currentOffset = progress * totalDistance;
             el.style.transform = `translateX(-${currentOffset}px)`;
             if (progress < 1) {
                 requestAnimationFrame(animate);
