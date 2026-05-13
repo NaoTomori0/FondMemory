@@ -12,14 +12,18 @@
             {% if post.file_type == 'photo' and post.file_filename %}
             <img src="{{ url_for('static', filename='uploads/' + post.file_filename) }}" alt="...">
             {% elif post.file_type == 'video' and post.file_filename %}
-            <video controls>
-                <source src="{{ url_for('static', filename='uploads/' + post.file_filename) }}" type="video/mp4">
-            </video>
+            <div class="video-wrapper">
+                <video controls playsinline>
+                    <source src="{{ url_for('static', filename='uploads/' + post.file_filename) }}" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+            </div>
             {% elif post.file_type == 'text' %}
             <div class="card-body">
                 <p class="card-text fs-5">{{ post.content }}</p>
             </div>
             {% endif %}
+
                 {% if post.description and post.file_type != 'text' %}
             <div class="card-body">
                 <p class="card-text">{{ post.description }}</p>
@@ -52,21 +56,53 @@
 {% else %}
 <p>У вас пока нет публикаций.</p>
 {% endif %}
-<div class="border-top"></div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    var grid = document.querySelector('.masonry-grid');
-    if (grid) {
-        imagesLoaded(grid, function() {
-            new Masonry(grid, {
+    (function() {
+        var grid = document.querySelector('.masonry-grid');
+        if (!grid) return;
+
+        function initMasonry() {
+            if (typeof Masonry === 'undefined') {
+                grid.style.display = 'flex';
+                grid.style.flexWrap = 'wrap';
+                return;
+            }
+
+            var msnry = new Masonry(grid, {
                 itemSelector: '.masonry-item',
                 columnWidth: '.masonry-item',
                 percentPosition: true,
                 gutter: 20
             });
-        });
-    }
+
+            imagesLoaded(grid, function() {
+                msnry.layout();
+            });
+
+            var videos = grid.querySelectorAll('video');
+            var videoPromises = Array.from(videos).map(function(video) {
+                return new Promise(function(resolve) {
+                    if (video.readyState >= 1) {
+                        resolve();
+                    } else {
+                        video.addEventListener('loadedmetadata', resolve, { once: true });
+                    }
+                });
+            });
+
+            Promise.all(videoPromises).then(function() {
+                msnry.layout();
+            });
+
+            window.addEventListener('resize', function() {
+                msnry.layout();
+            });
+        }
+
+        initMasonry();
+    })();
 </script>
 {% endblock %}
