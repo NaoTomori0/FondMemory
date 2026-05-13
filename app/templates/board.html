@@ -26,26 +26,20 @@
             {% endif %}
             <!-- Блок с сердечком и лайками (AJAX) -->
             <div class="card-footer d-flex justify-content-between align-items-center">
-                <div>
+                <div class="like-section" data-post-id="{{ post.id }}">
                     {% if current_user.is_authenticated %}
-                    {% if item.liked %}
-                    <a href="{{ url_for('board.unlike', post_id=post.id) }}" class="text-danger">
-                        <i class="fa-solid fa-heart"></i>
-                    </a>
-                    {% else %}
-                    <a href="{{ url_for('board.like', post_id=post.id) }}" class="text-muted">
-                        <i class="fa-regular fa-heart"></i>
-                    </a>
-                    {% endif %}
+                    <button class="btn btn-link p-0 border-0 like-btn {% if item.liked %}text-danger{% else %}text-muted{% endif %}" title="Нравится">
+                        <i class="{% if item.liked %}fa-solid fa-heart{% else %}fa-regular fa-heart{% endif %}"></i>
+                    </button>
                     {% else %}
                     <span class="text-muted">
                         <i class="fa-regular fa-heart"></i>
                     </span>
                     {% endif %}
-                    <span class="ms-1">{{ item.likes_count }}</span>
-                    <span class="ms-3 text-muted small">{{ post.author.username }} — {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                    <span class="likes-count ms-1">{{ item.likes_count }}</span>
                 </div>
                 {% if current_user.is_admin() %}
+                <!-- корзина удаления -->
                 <form method="POST" action="{{ url_for('admin.delete_post', id=post.id) }}" onsubmit="return confirm('Удалить этот пост?');">
                     <button type="submit" class="btn btn-sm btn-danger rounded-circle" title="Удалить пост">
                         <i class="fa-solid fa-trash-can"></i>
