@@ -146,8 +146,9 @@
         })
         .catch(err => console.error(err));
     });
+    
     // Лайтбокс
-document.addEventListener('click', function(e) {
+    document.addEventListener('click', function(e) {
     const trigger = e.target.closest('.lightbox-trigger');
     if (!trigger) return;
     e.preventDefault();
