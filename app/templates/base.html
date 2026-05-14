@@ -167,32 +167,7 @@ body {
     text-shadow: 0 0 8px rgba(0,0,0,0.5);
     margin-top: 0.5rem;
 }
-.sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    min-height: 100dvh;            /* динамическая высота, не обрезается адресной строкой */
-    width: 60px;
-    background: #1e1e1e;
-    z-index: 1040;
-    transition: width 0.3s ease;
-    overflow-x: hidden;
-    overflow-y: auto;              /* прокрутка, если контента больше */
-    white-space: nowrap;
-    padding-top: 70px;
-    padding-bottom: 20px;          /* небольшой отступ снизу */
-    display: flex;
-    flex-direction: column;
-}
 
-@media (max-width: 576px) {
-    .sidebar {
-        width: 50px;
-    }
-    body {
-        margin-left: 50px;
-    }
-}
 
 /* Адаптация для телефонов */
 @media (max-width: 576px) {
