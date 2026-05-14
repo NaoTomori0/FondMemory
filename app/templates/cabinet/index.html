@@ -117,5 +117,38 @@
 
     initMasonry();
 })();
+// Лайтбокс
+    document.addEventListener('click', function(e) {
+    const trigger = e.target.closest('.lightbox-trigger');
+    if (!trigger) return;
+    e.preventDefault();
+
+    const fullUrl = trigger.dataset.full;
+    if (!fullUrl) return;
+
+    // Создаём оверлей
+    const overlay = document.createElement('div');
+    overlay.className = 'lightbox-overlay active';
+    overlay.innerHTML = `
+        <button class="lightbox-close">&times;</button>
+        <img src="${fullUrl}" alt="Полноэкранный просмотр">
+    `;
+
+    // Закрытие по клику на кнопку или клавише Esc
+    overlay.querySelector('.lightbox-close').addEventListener('click', () => {
+        overlay.remove();
+    });
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.remove();
+    });
+    document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape') {
+            overlay.remove();
+            document.removeEventListener('keydown', escHandler);
+        }
+    });
+
+    document.body.appendChild(overlay);
+});
 </script>
 {% endblock %}
