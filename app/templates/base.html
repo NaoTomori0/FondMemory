@@ -167,6 +167,41 @@ body {
     text-shadow: 0 0 8px rgba(0,0,0,0.5);
     margin-top: 0.5rem;
 }
+
+/* Адаптация для телефонов */
+@media (max-width: 576px) {
+    .display-1 {
+        font-size: 2.5rem !important;   /* вместо гигантского размера */
+    }
+    .memorial-text {
+        font-size: 1.4rem;
+    }
+    .memorial-years {
+        font-size: 1.1rem;
+    }
+    .days-passed {
+        font-size: 1rem;
+    }
+    .lead {
+        font-size: 1rem;                /* кнопки и вспомогательный текст */
+    }
+    .btn-lg {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+    .masonry-item {
+        width: calc(100% - 20px) !important; /* одна колонка */
+    }
+}
+
+@media (max-width: 576px) {
+    .floating-item img {
+        height: 40px !important;   /* вместо 60-140px */
+    }
+    .floating-item {
+        font-size: 12px !important; /* текст поменьше */
+    }
+}
         </style>
         <!-- Fancybox
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css">
