@@ -162,10 +162,9 @@ sudo systemctl enable fondmemory
 
 ### 9. Настройте Nginx
 
-Создайте конфигурацию /etc/nginx/sites-available/fondmemory:
+Создайте конфигурацию `/etc/nginx/sites-available/fondmemory`:
 
-```
-nginx
+```nginx
 server {
     listen 80;
     server_name ваш_домен.ru www.ваш_домен.ru;
