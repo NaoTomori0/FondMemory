@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
-<div class="text-center mt-5">
+<div class="text-center mt-5" style="position: relative; z-index: 10;">
     <h1 class="display-1 fw-bold">Fond Memory</h1>
     {% if memorial_name %}
     <p class="memorial-text mt-2 mb-1">{{ memorial_name }}</p>
@@ -20,12 +20,13 @@
     <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg mt-3 mb-4">Войти</a>
     {% endif %}
 </div>
-<div id="flying-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; overflow: hidden;"></div>
+<div id="flying-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden;"></div>
 {% endblock %}
 
 {% block scripts %}
-<script>const container = document.getElementById('flying-container');
-const posts = [
+<script>
+    const container = document.getElementById('flying-container');
+    const posts = [
         {% for post in flying_posts %}
         {
             type: "{{ post.file_type }}",
@@ -37,104 +38,97 @@ const posts = [
         },
         {% endfor %}
     ];
-    
 
-const recentPosts = [];
-const MAX_RECENT = 10;
+    // Храним последние 5 использованных постов, чтобы не повторяться
+    const recentPosts = [];
+    const MAX_RECENT = 5;
 
-function getRandomPost() {
-    if (posts.length === 0) return null;
-    let attempts = 0;
-    let post;
-    do {
-        post = posts[Math.floor(Math.random() * posts.length)];
-        attempts++;
-        if (attempts > 50) break; 
-    } while (recentPosts.includes(post));
+    function getRandomPost() {
+        if (posts.length === 0) return null;
+        let attempts = 0;
+        let post;
+        do {
+            post = posts[Math.floor(Math.random() * posts.length)];
+            attempts++;
+            if (attempts > 50) break;
+        } while (recentPosts.includes(post));
 
-    recentPosts.push(post);
-    if (recentPosts.length > MAX_RECENT) {
-        recentPosts.shift();
-    }
-    return post;
-}
-
-function createFlyingElement(post) {
-    if (post.type === 'text') {
-        _createElement(post, null);
-    } else if (post.src) {
-        const img = new Image();
-        img.onload = function() {
-            _createElement(post, img);
-        };
-        img.onerror = function() {
-            _createElement(post, null);
-        };
-        img.src = post.src;
-    }
-}
-
-function _createElement(post, preloadedImg) {
-    const el = document.createElement('div');
-    el.className = 'floating-item';
-    el.style.position = 'absolute';
-    el.style.top = (Math.random() * 70 + 15) + '%';
-    el.style.left = '125%';
-    el.style.whiteSpace = 'nowrap';
-    el.style.opacity = '0';
-    el.style.transition = 'opacity 1s ease-in';
-    el.style.textAlign = 'left';
-    el.style.color = 'white';
-    el.style.textShadow = '0 0 8px rgba(0,0,0,0.8)';
-    el.style.fontSize = (Math.random() * 20 + 16) + 'px';
-
-    if (post.type === 'text') {
-        el.textContent = post.text;
-    } else if (preloadedImg) {
-        const img = preloadedImg.cloneNode();
-        img.style.height = (Math.random() * 80 + 60) + 'px';
-        img.style.borderRadius = '12px';
-        img.style.boxShadow = '0 0 12px rgba(0,0,0,0.5)';
-        img.style.display = 'block';
-        el.appendChild(img);
-    }
-
-    container.appendChild(el);
-
-    requestAnimationFrame(() => {
-        el.style.opacity = '0.9';
-    });
-
-    const speed = Math.random() * 50 + 100;
-    const startTime = Date.now();
-    const totalDistance = (window.innerWidth * 1.4) + el.offsetWidth;
-    const duration = (totalDistance / speed) * 1000;
-
-    setTimeout(() => {
-        function animate() {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            const currentOffset = progress * totalDistance;
-            el.style.transform = `translateX(-${currentOffset}px)`;
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                el.remove();
-            }
+        recentPosts.push(post);
+        if (recentPosts.length > MAX_RECENT) {
+            recentPosts.shift();
         }
-        requestAnimationFrame(animate);
-    }, 1000);
-}
-
-function launchRandomPost() {
-    const randomPost = getRandomPost();
-    if (randomPost) {
-        createFlyingElement(randomPost);
+        return post;
     }
-}
 
-launchRandomPost();
-setInterval(launchRandomPost, 500 + Math.random() * 1000);
+    function createFlyingElement(post) {
+        const el = document.createElement('div');
+        el.className = 'floating-item';
+        el.style.position = 'absolute';
+        el.style.top = (Math.random() * 70 + 15) + '%';
+        el.style.left = '100%';
+        el.style.whiteSpace = 'nowrap';
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 1s ease-in';
+        el.style.textAlign = 'left';
+        el.style.color = 'white';
+        el.style.textShadow = '0 0 8px rgba(0,0,0,0.8)';
+        el.style.fontSize = (Math.random() * 20 + 16) + 'px';
+
+        if (post.type === 'text') {
+            el.textContent = post.text;
+        } else if (post.src) {
+            const img = new Image();
+            img.onload = function() {
+                const imgClone = img.cloneNode();
+                imgClone.style.height = (Math.random() * 80 + 60) + 'px';
+                imgClone.style.borderRadius = '12px';
+                imgClone.style.boxShadow = '0 0 12px rgba(0,0,0,0.5)';
+                imgClone.style.display = 'block';
+                el.appendChild(imgClone);
+                el.style.opacity = '0.9';
+            };
+            img.src = post.src;
+            // Показываем текстовый плейсхолдер, пока картинка грузится
+            el.textContent = 'Загрузка...';
+            el.style.opacity = '0.6';
+        } else {
+            return;
+        }
+
+        container.appendChild(el);
+
+        requestAnimationFrame(() => {
+            el.style.opacity = '0.9';
+        });
+
+        const speed = Math.random() * 50 + 100;
+        const startTime = Date.now();
+        const duration = (window.innerWidth + el.offsetWidth + 200) / speed * 1000;
+
+        setTimeout(() => {
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const currentOffset = progress * (window.innerWidth + el.offsetWidth + 200);
+                el.style.transform = `translateX(-${currentOffset}px)`;
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    el.remove();
+                }
+            }
+            requestAnimationFrame(animate);
+        }, 1000);
+    }
+
+    function launchRandomPost() {
+        const randomPost = getRandomPost();
+        if (randomPost) {
+            createFlyingElement(randomPost);
+        }
+    }
+
+    launchRandomPost();
+    setInterval(launchRandomPost, 2000 + Math.random() * 3000);
 </script>
 {% endblock %}
