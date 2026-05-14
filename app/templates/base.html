@@ -168,24 +168,6 @@ body {
     margin-top: 0.5rem;
 }
 
-.sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    min-height: 100dvh;            /* динамическая высота, не обрезается адресной строкой */
-    width: 60px;
-    background: #1e1e1e;
-    z-index: 1040;
-    transition: width 0.3s ease;
-    overflow-x: hidden;
-    overflow-y: auto;              /* прокрутка, если контента больше */
-    white-space: nowrap;
-    padding-top: 70px;
-    padding-bottom: 20px;          /* небольшой отступ снизу */
-    display: flex;
-    flex-direction: column;
-}
-
 /* Адаптация для телефонов */
 @media (max-width: 576px) {
     .display-1 {
@@ -218,29 +200,6 @@ body {
     }
     .floating-item {
         font-size: 12px !important; /* текст поменьше */
-    }
-}
-
-@media (max-width: 576px) {
-    /* Уменьшаем верхний отступ сайдбара, чтобы освободить место */
-    .sidebar {
-        padding-top: 20px !important;
-    }
-    
-    /* Делаем отступы у ссылок компактнее */
-    .sidebar a {
-        padding: 10px 15px !important;
-    }
-    
-    /* Немного уменьшаем сами иконки */
-    .sidebar a i {
-        font-size: 1.2rem !important;
-        width: 25px !important;
-    }
-    
-    /* Сбрасываем жесткий маргин, если элементов слишком много */
-    .sidebar a.mt-auto {
-        margin-top: 10px !important;
     }
 }
         </style>
@@ -303,7 +262,7 @@ body {
                 <span class="link-text">Регистрация</span>
             </a>
             {% endif %}
-            <a href="{{ url_for('main.donate') }}" title="Поддержать" class="mt-auto">
+            <a href="{{ url_for('main.donate') }}" title="Поддержать">
                 <i class="fa-solid fa-hand-holding-heart"></i>
                 <span class="link-text">Поддержать</span>
             </a>
