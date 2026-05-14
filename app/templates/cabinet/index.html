@@ -60,49 +60,62 @@
 
 {% block scripts %}
 <script>
-    (function() {
-        var grid = document.querySelector('.masonry-grid');
-        if (!grid) return;
+(function() {
+    var grid = document.querySelector('.masonry-grid');
+    if (!grid) return;
 
-        function initMasonry() {
-            if (typeof Masonry === 'undefined') {
-                grid.style.display = 'flex';
-                grid.style.flexWrap = 'wrap';
-                return;
-            }
-
-            var msnry = new Masonry(grid, {
-                itemSelector: '.masonry-item',
-                columnWidth: '.masonry-item',
-                percentPosition: true,
-                gutter: 20
-            });
-
-            imagesLoaded(grid, function() {
-                msnry.layout();
-            });
-
-            var videos = grid.querySelectorAll('video');
-            var videoPromises = Array.from(videos).map(function(video) {
-                return new Promise(function(resolve) {
-                    if (video.readyState >= 1) {
-                        resolve();
-                    } else {
-                        video.addEventListener('loadedmetadata', resolve, { once: true });
-                    }
-                });
-            });
-
-            Promise.all(videoPromises).then(function() {
-                msnry.layout();
-            });
-
-            window.addEventListener('resize', function() {
-                msnry.layout();
-            });
+    function initMasonry() {
+        if (typeof Masonry === 'undefined') {
+            grid.style.display = 'flex';
+            grid.style.flexWrap = 'wrap';
+            return;
         }
 
-        initMasonry();
-    })();
+        var msnry = new Masonry(grid, {
+            itemSelector: '.masonry-item',
+            columnWidth: '.masonry-item',
+            percentPosition: true,
+            gutter: 20
+        });
+
+        imagesLoaded(grid, function() {
+            msnry.layout();
+        });
+
+        // Ждём загрузки метаданных всех видео
+        var videos = grid.querySelectorAll('video');
+        var videoPromises = Array.from(videos).map(function(video) {
+            return new Promise(function(resolve) {
+                if (video.readyState >= 1) {
+                    resolve();
+                } else {
+                    video.addEventListener('loadedmetadata', resolve, { once: true });
+                }
+            });
+        });
+
+        Promise.all(videoPromises).then(function() {
+            // Подгоняем высоту каждого видео-контейнера под реальное соотношение сторон
+            videos.forEach(function(video) {
+                var wrapper = video.closest('.video-wrapper');
+                if (!wrapper) return;
+                var videoWidth = video.videoWidth || video.clientWidth;
+                var videoHeight = video.videoHeight || video.clientHeight;
+                if (videoWidth && videoHeight) {
+                    var aspectRatio = videoHeight / videoWidth;
+                    var paddingPercent = aspectRatio * 100;
+                    wrapper.style.paddingTop = paddingPercent + '%';
+                }
+            });
+            msnry.layout();
+        });
+
+        window.addEventListener('resize', function() {
+            msnry.layout();
+        });
+    }
+
+    initMasonry();
+})();
 </script>
 {% endblock %}
