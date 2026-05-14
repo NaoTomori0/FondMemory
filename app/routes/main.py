@@ -54,3 +54,22 @@ def index():
         plural_days=plural_days,
         year=datetime.now().year,
     )
+
+
+@bp.route("/donate")
+def donate():
+    donate_info = {
+        "title": os.environ.get("DONATE_TITLE", "Поддержать проект"),
+        "description": os.environ.get("DONATE_DESCRIPTION", ""),
+        "boosty_link": os.environ.get("DONATE_DONATIONS_LINK", ""),
+        "boosty_text": os.environ.get("DONATE_DONATIONS_TEXT", "Поддержать"),
+        "card_number": os.environ.get("DONATE_CARD_NUMBER", ""),
+        "card_bank": os.environ.get("DONATE_CARD_BANK", ""),
+        "card_holder": os.environ.get("DONATE_CARD_HOLDER", ""),
+        "card_purpose": os.environ.get("DONATE_CARD_PURPOSE", ""),
+    }
+    return render_template(
+        "donate.html",
+        donate=donate_info,
+        year=datetime.now().year,
+    )

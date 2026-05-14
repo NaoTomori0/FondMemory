@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="container py-5" style="max-width: 600px;">
+    <h1 class="mb-4">{{ donate.title }}</h1>
+    {% if donate.description %}
+    <p class="lead">{{ donate.description }}</p>
+    {% endif %}
+
+    {% if donate.boosty_link %}
+    <div class="text-center my-5">
+        <a
+            href="{{ donate.boosty_link }}"
+            class="btn btn-success btn-lg"
+            target="_blank"
+            rel="noopener"
+        >
+            💳 {{ donate.boosty_text }}
+        </a>
+        {% if 'tbank.ru' in donate.boosty_link %}
+        <p class="text-muted mt-4 small">Безопасный платёж. Вы будете перенаправлены на официальный сайт Т‑Банка.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if donate.card_number %}
+    <hr>
+    <h5>Реквизиты для прямого перевода</h5>
+    <div class="card bg-dark mb-3">
+        <div class="card-body">
+            <p>
+                <strong>Банк:</strong> {{ donate.card_bank }}
+            </p>
+            <p>
+                <strong>Получатель:</strong> {{ donate.card_holder }}
+            </p>
+            <p>
+                <strong>Номер карты:</strong> {{ donate.card_number }}
+            </p>
+            {% if donate.card_purpose %}
+            <p>
+                <strong>Назначение платежа:</strong> {{ donate.card_purpose }}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    <p class="text-muted small">Спасибо за вашу помощь! Каждый рубль приближает нас к тому, чтобы сайт жил дольше.</p>
+</div>
+{% endblock %}
