@@ -7,6 +7,9 @@
     {% if memorial_years %}
     <p class="memorial-years mb-4">{{ memorial_years }}</p>
     {% endif %}
+    {% if days_passed is not none %}
+    <p class="days-passed">{{ days_passed }} дней прошло</p>
+    {% endif %}
     {% endif %}
     <p class="lead mt-3">Сохраните самые тёплые воспоминания</p>
     {% if current_user.is_authenticated %}

@@ -62,6 +62,7 @@ MAIL_PASSWORD=пароль_приложения_яндекса
 MAIL_DEFAULT_SENDER=your_email@yandex.ru
 MEMORY_NAME=Иван Иванович Иванов
 MEMORY_YEARS=1956–2024
+MEMORY_DATE=2025-12-01   # Дата в формате ГГГГ-ММ-ДД
 BASE_URL=...
 ```
 
