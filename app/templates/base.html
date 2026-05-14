@@ -167,23 +167,78 @@ body {
     text-shadow: 0 0 8px rgba(0,0,0,0.5);
     margin-top: 0.5rem;
 }
-
 .sidebar {
     position: fixed;
     left: 0;
     top: 0;
-    height: 100vh;
+    min-height: 100dvh;            /* динамическая высота, не обрезается адресной строкой */
     width: 60px;
     background: #1e1e1e;
     z-index: 1040;
     transition: width 0.3s ease;
     overflow-x: hidden;
+    overflow-y: auto;              /* прокрутка, если контента больше */
     white-space: nowrap;
     padding-top: 70px;
-    
-    /* ВАЖНО: флекс-контейнер */
+    padding-bottom: 20px;          /* небольшой отступ снизу */
     display: flex;
     flex-direction: column;
+}
+
+.sidebar:hover {
+    width: 220px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: #ccc;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.sidebar a:hover {
+    background: #333;
+    color: #fff;
+}
+
+.sidebar a i {
+    font-size: 1.5rem;
+    width: 30px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.sidebar a .link-text {
+    display: none;
+}
+
+.sidebar:hover a .link-text {
+    display: inline;
+}
+
+body {
+    margin-left: 60px;
+}
+
+/* На телефонах панель чуть уже */
+@media (max-width: 576px) {
+    .sidebar {
+        width: 50px;
+    }
+    body {
+        margin-left: 50px;
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar {
+        width: 50px;
+    }
+    body {
+        margin-left: 50px;
+    }
 }
 
 /* Адаптация для телефонов */
