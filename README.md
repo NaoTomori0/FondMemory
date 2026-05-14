@@ -90,13 +90,17 @@ python run.py
 ```bash
 sudo apt update
 sudo apt install python3-pip python3-venv nginx git -y
-2. Скопируйте проект на сервер
+```
+
+### 2. Скопируйте проект на сервер
+
+```
 bash
 git clone https://github.com/NaoTomori/FondMemory.git /home/nao/FondMemory
 cd /home/nao/FondMemory
 ```
 
-### 2. Настройте виртуальное окружение и установите зависимости
+### 3. Настройте виртуальное окружение и установите зависимости
 
 ```bash
 python3 -m venv venv
@@ -105,9 +109,9 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 3. Создайте файл .env (как в шаге 3 разработки)
+### 4. Создайте файл .env (как в шаге 3 разработки)
 
-### 4. Инициализируйте базу данных
+### 5. Инициализируйте базу данных
 
 ```bash
 flask db init
@@ -116,7 +120,7 @@ flask db upgrade
 flask create-admin
 ```
 
-### 5. Настройте Gunicorn
+### 6. Настройте Gunicorn
 
 Создайте файл wsgi.py:
 
@@ -126,7 +130,7 @@ from app import create_app
 app = create_app()
 ```
 
-### 6. Создайте systemd-юнит /etc/systemd/system/fondmemory.service:
+### 7. Создайте systemd-юнит /etc/systemd/system/fondmemory.service:
 
 ```ini
 [Unit]
@@ -147,7 +151,7 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-### 7. Запустите сервис:
+### 8. Запустите сервис:
 
 ```
 bash
@@ -156,7 +160,7 @@ sudo systemctl start fondmemory
 sudo systemctl enable fondmemory
 ```
 
-### 8. Настройте Nginx
+### 9. Настройте Nginx
 
 Создайте конфигурацию /etc/nginx/sites-available/fondmemory:
 
@@ -189,7 +193,7 @@ server {
 }
 ```
 
-### 9. Активируйте сайт:
+### 10. Активируйте сайт:
 
 ```
 bash
@@ -198,7 +202,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-### 10. Настройте SSL (если есть домен)
+### 11. Настройте SSL (если есть домен)
 
 ```
 bash
