@@ -77,10 +77,10 @@ async def upload():
             file = request.files.get("file")
             if not file or file.filename == "":
                 flash("Выберите файл", "danger")
-                return render_template("upload.html")
+                return render_template("upload.html", year=datetime.now().year)
             if not allowed_file(file.filename):
                 flash("Допустимые форматы: PNG, JPG, GIF, MP4, MOV, AVI", "danger")
-                return render_template("upload.html")
+                return render_template("upload.html", year=datetime.now().year)
 
             filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
             filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
@@ -103,7 +103,7 @@ async def upload():
             flash("Файл загружен и отправлен на модерацию", "success")
             return redirect(url_for("board.index"))
 
-    return render_template("upload.html")
+    return render_template("upload.html", year=datetime.now().year)
 
 
 # API-маршруты для AJAX-лайков
