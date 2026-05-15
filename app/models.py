@@ -4,6 +4,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import secrets
 
+moscow_tz = zoneinfo.ZoneInfo("Europe/Moscow")
+current_time = datetime.now(moscow_tz)
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)

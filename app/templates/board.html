@@ -42,7 +42,10 @@
                     <span class="likes-count ms-1">{{ item.likes_count }}</span>
                 </div>
                 <div class="text-muted small">
-                    {{ post.author.username }} — {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}
+                    {{ post.author.username }} —
+                    <span class="post-date" data-utc="{{ post.created_at.isoformat() }}Z">
+                        {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}
+                    </span>
                 </div>
                 {% if current_user.is_admin() %}
                 <form method="POST" action="{{ url_for('admin.delete_post', id=post.id) }}" onsubmit="return confirm('Удалить этот пост?');">

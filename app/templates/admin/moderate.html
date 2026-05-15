@@ -9,7 +9,13 @@
             {% if post.file_type == 'text' %}
             <div class="card-body">
                 <p class="card-text fs-5">{{ post.content }}</p>
-                <p class="text-muted small">— {{ post.author.username }} ({{ post.created_at.strftime('%d.%m.%Y %H:%M') }})</p>
+                <p class="text-muted small">
+                    — {{ post.author.username }} (
+                    <span class="post-date" data-utc="{{ post.created_at.isoformat() }}Z">
+                        {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}
+                    </span>
+                    )
+                </p>
             </div>
             {% elif post.file_filename %}
             {% if post.file_type == 'photo' %}
@@ -23,7 +29,11 @@
             {% endif %}
             <div class="card-body">
                 <p class="card-text">{{ post.description or '' }}</p>
-                <p class="text-muted small">{{ post.author.username }} — {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                <p class="text-muted small">{{ post.author.username }} —
+                    <span class="post-date" data-utc="{{ post.created_at.isoformat() }}Z">
+                        {{ post.created_at.strftime('%d.%m.%Y %H:%M') }}
+                    </span>
+                </p>
             </div>
             {% endif %}
             <div class="card-footer">
