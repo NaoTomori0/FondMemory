@@ -41,7 +41,7 @@ def index():
             )
             now_msk = datetime.now(MSK)
             delta = now_msk - memorial_date
-            days_passed = delta.days
+            days_passed = delta.days + 1
         except ValueError:
             days_passed = None
 
