@@ -2,6 +2,7 @@ import os
 from datetime import datetime, timezone, timedelta
 from flask import Blueprint, render_template
 from app.models import Post
+from sqlalchemy import func
 
 MSK = timezone(timedelta(hours=3))
 
@@ -25,8 +26,8 @@ bp = Blueprint("main", __name__)
 def index():
     flying_posts = (
         Post.query.filter_by(approved=True)
-        .order_by(Post.created_at.desc())
-        .limit(30)
+        .order_by(func.random())
+        .limit(35)
         .all()
     )
     memorial_name = os.environ.get("MEMORY_NAME", "")
