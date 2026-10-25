@@ -1,6 +1,7 @@
 import os
 from datetime import datetime, timezone, timedelta
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, session
+import random
 from app.models import Post
 from sqlalchemy import func
 
@@ -24,12 +25,34 @@ bp = Blueprint("main", __name__)
 
 @bp.route("/")
 def index():
-    flying_posts = (
-        Post.query.filter_by(approved=True)
-        .order_by(func.random())
-        .limit(35)
-        .all()
-    )
+    
+    all_ids = [p.id for p in Post.query.filter_by(approved=True).with_entities(Post.id).all()]
+    
+    if 'viewed_ids' not in session:
+        session['viewed_ids'] = []
+        
+    available_ids = [post_id for post_id in all_ids if post_id not in session['viewed_ids']]
+    
+    if len(available_ids) < 50:
+        session['viewed_ids'] = []
+        available_ids = all_ids
+
+    chosen_ids = random.sample(available_ids, min(len(available_ids), 30))
+    
+    current_viewed = session['viewed_ids']
+    current_viewed.extend(chosen_ids)
+    session['viewed_ids'] = current_viewed
+
+    flying_posts = Post.query.filter(Post.id.in_(chosen_ids)).all()
+    random.shuffle(flying_posts)
+
+
+    # flying_posts = (
+    #     Post.query.filter_by(approved=True)
+    #     .order_by(func.random())
+    #     .limit(35)
+    #     .all()
+    # )
     memorial_name = os.environ.get("MEMORY_NAME", "")
     memorial_years = os.environ.get("MEMORY_YEARS", "")
     memorial_date_str = os.environ.get("MEMORY_DATE", "")
